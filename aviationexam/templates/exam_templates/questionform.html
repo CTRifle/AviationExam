@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exam Question</title>
+</head>
+<body>
+    <center>
+        <h1>Exam Progress {{ exam.current_question|add:"1" }}/{{ exam.question_amount }}</h1>
+        <br>
+        {% if message is None %}
+            <form action="" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+                <input type="submit" value="Submit Answer">
+        {% else %}
+            {% for qs in options %}
+                {% if qs == question.answer %}
+                    <p><strong><font color="green">{{ options|get_item:qs }}</font></strong></p>
+                {% elif qs == selected_answer %}
+                    <p><strong><font color="red">{{ options|get_item:qs }}</font></strong></p>
+                {% else %}
+                    <p>{{ options|get_item:qs }}</p>
+                {% endif %}
+            {% endfor %}
+            {{ message }}
+
+            <a href={% url 'question_form' pk %}><button>Next Question</button>
+        {% endif %}
+</a>
+    </center>
+
+</body>
+</html>

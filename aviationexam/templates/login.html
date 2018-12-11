@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Log In</title>
+</head>
+<center><body>
+<p style="color:red">{{ error_message }}</p>
+<br>
+<form action={% url 'log_user' %} method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Log in">
+
+</body></center>
+</html>

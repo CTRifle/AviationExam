@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Previous Tests</title>
+</head>
+<body>
+{% for exam in all_exams %}
+    <p>Test #{{ exam.id }}      Subject: {{ exam.subject }}</p>
+{% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create User</title>
+</head>
+<h1>Create a user to be able to save progress and take tests!</h1>
+<br>
+<p>
+    <form action={% url 'create_user' %} method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit">
+</form>
+</p>
+<body>
+
+</body>
+</html>

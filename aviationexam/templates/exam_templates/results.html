@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Results</title>
+</head>
+<body>
+<p>Here are your results!</p>
+<br>
+{% for question in incorrect_questions %}
+<h1>{{ question.text }}</h1>
+<p>{{ question.choiceA }}</p>
+<p>{{ question.choiceB }}</p>
+<p>{{ question.choiceC }}</p>
+<p>{{ question.choiceD }}</p>
+<br>
+<p>Explanation: {{ question.answer_text }}</p>
+<br>
+<br>
+{% endfor %}
+
+</body>
+</html>
