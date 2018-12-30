@@ -1,34 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends "header.html" %}
+{% load static %}
 <head>
-    <meta charset="UTF-8">
-    <title>Exam Question</title>
+
 </head>
+{% block maincontent %}
 <body>
-    <center>
-        <h1>Exam Progress {{ exam.current_question|add:"1" }}/{{ exam.question_amount }}</h1>
-        <br>
-        {% if message is None %}
-            <form action="" method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-                <input type="submit" value="Submit Answer">
-        {% else %}
-            {% for qs in options %}
-                {% if qs == question.answer %}
-                    <p><strong><font color="green">{{ options|get_item:qs }}</font></strong></p>
-                {% elif qs == selected_answer %}
-                    <p><strong><font color="red">{{ options|get_item:qs }}</font></strong></p>
-                {% else %}
-                    <p>{{ options|get_item:qs }}</p>
-                {% endif %}
-            {% endfor %}
-            {{ message }}
-
-            <a href={% url 'question_form' pk %}><button>Next Question</button>
-        {% endif %}
-</a>
-    </center>
-
+    <link rel="stylesheet" type="text/css" href="{% static 'questionform.css' %}">
+        <center>
+            <h1>Exam Progress {{ exam.current_question }}/{{ exam.question_amount }}</h1>
+            <br>
+            {% if message is None %}
+                <form action="" method="post">
+                {% csrf_token %}
+                    <div>
+                    {% for field in form %}
+                        <label>{{ field.label_tag }}</label>
+                        <p>{{ field }}</p>
+                    {% endfor %}
+                    <input type="submit" value="Submit Answer" class="button">
+                    </div>
+                </form>
+            {% else %}
+                <div class="form-answer">
+                    <label>{{ question_text }}</label>
+                    <br>
+                    {% for qs in options %}
+                        {% if qs == question.answer %}
+                            <p id="correct-option">{{ options|get_item:qs }}</p>
+                        {% elif qs == selected_answer %}
+                            <p id="incorrect-option">{{ options|get_item:qs }}</p>
+                        {% else %}
+                            <p>{{ options|get_item:qs }}</p>
+                        {% endif %}
+                    <br>
+                    {% endfor %}
+                    <p class="explanation">{{ message }}</p>
+                    <br>
+                    <a href={% url 'question_form' pk %}><button>Next Question</button></a>
+                </div>
+            {% endif %}
+        </center>
 </body>
+{% endblock %}
 </html>

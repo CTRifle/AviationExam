@@ -1,14 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends "header.html" %}
+{% load static %}
+{% block maincontent %}
+<link rel="stylesheet" type="text/css" href="{% static 'newexam.css' %}">
 <head>
-    <meta charset="UTF-8">
-    <title>New Exam</title>
-</head>
-<form action= {% url "new_exam" %} method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Start New">
-<body>
 
+</head>
+    <b>
+<body>
+    <center>
+        <form action= {% url "new_exam" %} method="post">{% csrf_token %}
+            <div class="fields">
+                <label>Question amount (1-100)</label>
+                <p>{{ form.question_amount }}</p>
+                <label>Select exam subject</label>
+                <p>{{ form.subject }}</p>
+                <label>Select when you would like to review your progress</label>
+                <p>{{ form.feedback }}</p>
+            <input type="submit" class="button" value="Start New">
+            </div>
+    </center>
 </body>
+{% endblock %}
 </html>

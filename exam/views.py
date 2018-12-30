@@ -11,6 +11,11 @@ from django.template.defaulttags import register
 def get_item(dictionary, key):
     return dictionary.get(key)
 
+@register.filter
+def answer(id):
+    pass
+
+
 def welcome(request):
     return render(request, "welcome.html")
 
@@ -59,8 +64,10 @@ def log_in(request):
                     "form" : form,
                 }
                 return render(request, "login.html", context)
+
     return render(request, "login.html", context)
 
+@login_required()
 def new_exam(request):
     form = NewExam()
     context = {
@@ -85,7 +92,7 @@ def new_exam(request):
 @login_required
 def previous_exams(request):
 
-    all_exams = Exam.objects.filter(user=request.user)
+    all_exams = Exam.objects.filter(user=request.user).order_by("-id")
     context = {
         "all_exams" : all_exams,
     }
@@ -97,6 +104,8 @@ def question_form(request, pk):
     try:
         question_object = current_exam.get_question()
     except:
+        current_exam.is_complete = True
+        current_exam.save()
         return HttpResponseRedirect(reverse('results', kwargs={'pk': pk}))
 
     form = OptionSubmit(question_object)
@@ -119,7 +128,10 @@ def question_form(request, pk):
                     current_exam.current_question += 1
                     incorrect_list = [current_exam.incorrect_questions]
                     incorrect_list.append(str(question_object.id))
+                    incorrect_answers_list = [current_exam.incorrect_answers]
+                    incorrect_answers_list.append(str(submitted_answer))
                     current_exam.incorrect_questions = ",".join(incorrect_list)
+                    current_exam.incorrect_answers = ",".join(incorrect_answers_list)
                     current_exam.save()
                     return HttpResponseRedirect(reverse('question_form', kwargs={'pk': pk}))
             else:
@@ -147,7 +159,10 @@ def question_form(request, pk):
                     current_exam.current_question += 1
                     incorrect_list = [current_exam.incorrect_questions]
                     incorrect_list.append(str(question_object.id))
+                    incorrect_answers_list = [current_exam.incorrect_answers]
+                    incorrect_answers_list.append(str(submitted_answer))
                     current_exam.incorrect_questions = ",".join(incorrect_list)
+                    current_exam.incorrect_answers = ",".join(incorrect_answers_list)
                     current_exam.save()
                     options = {
                         "a": question_object.choiceA,
@@ -162,19 +177,43 @@ def question_form(request, pk):
                         "pk" : pk,
                         "options" : options,
                         "exam" : current_exam,
+                        "question_text" : question_object.text,
                     }
                     return render(request, "exam_templates/questionform.html", context)
 
     return render(request, "exam_templates/questionform.html", context)
 
+def continue_exam(request):
+    if request.method == 'POST':
+        exam_id = int(request.POST.get("exam_id"))
+        return HttpResponseRedirect(reverse('question_form', kwargs={'pk': exam_id }))
+
+    else:
+        return redirect("exam_templates/previousexams.html")
+
+
+@login_required()
 def results(request, pk):
     current_exam = Exam.objects.get(id=int(pk))
     incorrect_questions = current_exam.get_incorrect_questions()
+    result_message = current_exam.result_message()
+    percent = current_exam.result_percentage()
+    choices = {
+        "a": "incorrect_questions.choiceA",
+        "b": "question.choiceB",
+        "c": "question.choiceC",
+        "d": "question.choiceD",
+    }
 
+    answer_question_list = zip(incorrect_questions, current_exam.incorrect_answers)
     context = {
         "exam" : current_exam,
         "pk" : pk,
         "incorrect_questions": incorrect_questions,
+        "result_message" : result_message,
+        "percent" : percent,
+        "choices" : choices,
+        "answer_question_list" : answer_question_list,
     }
 
     return render(request, "exam_templates/results.html", context)

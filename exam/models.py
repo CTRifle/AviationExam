@@ -16,10 +16,13 @@ class Exam(models.Model):
     subject = models.CharField(max_length=100, default='', choices=subjects)
     question_amount = models.IntegerField(default=10)
     question_order = models.CharField(max_length=200, validators=[validate_comma_separated_integer_list], default='')
-    incorrect_questions = models.CharField(max_length=200, validators=[validate_comma_separated_integer_list], default='')
+    incorrect_questions = models.CharField(max_length=200, validators=[validate_comma_separated_integer_list],
+                                           default='')
+    incorrect_answers = models.CharField(max_length=200, default='')
     current_question = models.IntegerField(default=0)
     answer_at_end = models.BooleanField(default=True)
     score = models.IntegerField(default=0)
+    is_complete = models.BooleanField(default=False)
 
     def set_questions(self):
         ques_ids = random.sample(range(1, Question.objects.latest('id').id), int(self.question_amount))
@@ -39,6 +42,24 @@ class Exam(models.Model):
         object = Question.objects.filter(id__in=question_list)
         return object
 
+    def get_incorrect_answers(self): ## Returns a list of the wrong answers in order
+        wrong_answer_list = self.incorrect_questions.split(",")
+        del wrong_answer_list[0]
+        wrong_list = Question.objects.filter(id__in=wrong_answer_list)
+        return wrong_list
+
+    def result_message(self):
+        fail_message = "You need to review some more, see below for study topics."
+        pass_message = "You are over the pass mark for the PSTAR exam, good job!"
+        if self.score == 0:
+            return fail_message
+        elif ((self.score/self.question_amount) * 100) < 90:
+            return fail_message
+        else:
+            return pass_message
+
+    def result_percentage(self):
+        return round(((self.score/self.question_amount) * 100))
 
     def __str__(self):
         return "Exam" + str(self.pk) + "-" + str(self.subject)

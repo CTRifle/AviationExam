@@ -1,13 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends "header.html" %}
+{% load static %}
+{% block maincontent %}
 <head>
     <meta charset="UTF-8">
     <title>Previous Tests</title>
 </head>
 <body>
-{% for exam in all_exams %}
-    <p>Test #{{ exam.id }}      Subject: {{ exam.subject }}</p>
-{% endfor %}
-
+<link rel="stylesheet" type="text/css" href="{% static 'previousexam.css' %}">
+<center>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Score</th>
+        </tr>
+        {% for exam in all_exams %}
+        <tr>
+            <td>Test {{ exam.id }}</td>
+            <td>{{ exam.subject }}</td>
+            <td>{% if exam.is_complete == True %}
+                    <font color="green">COMPLETE</font>
+                {% else %}
+                    <font color="red">INCOMPLETE</font>
+                {% endif %}
+            </td>
+            <td>{% if exam.is_complete == True %}
+                    {{ exam.score }}/{{ exam.question_amount }}
+                {% else %}
+                    <form action= {% url "continue_exam" %} method="post">{% csrf_token %}
+                        <input type="hidden" name="exam_id" value="{{ exam.id }}">
+                        <input type="submit" value="Continue">
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</center>
 </body>
+{% endblock %}
 </html>

@@ -1,23 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends "header.html" %}
+{% load static %}
+{% block maincontent %}
 <head>
     <meta charset="UTF-8">
     <title>Results</title>
 </head>
 <body>
-<p>Here are your results!</p>
-<br>
-{% for question in incorrect_questions %}
-<h1>{{ question.text }}</h1>
-<p>{{ question.choiceA }}</p>
-<p>{{ question.choiceB }}</p>
-<p>{{ question.choiceC }}</p>
-<p>{{ question.choiceD }}</p>
-<br>
-<p>Explanation: {{ question.answer_text }}</p>
-<br>
-<br>
-{% endfor %}
+<link rel="stylesheet" type="text/css" href="{% static 'results.css' %}">
+    <center>
+    {% if percent < 90 %}
+        <p id="percent"><font color="red">{{ percent }}%</font></p>
+    {% else %}
+        <p id="percent"><font color="green">{{ percent }}%</font></p>
+    {% endif %}
+    <p>{{ result_message }}</p>
+    <br>
+        {% for question in incorrect_questions %}
+            <div class="question-display">
+                <h1>{{ question.text }}</h1>
+                <p>{{ question.choiceA }}</p>
+                <p>{{ question.choiceB }}</p>
+                <p>{{ question.choiceC }}</p>
+                <p>{{ question.choiceD }}</p>
+                <br>
+                <p>Explanation: {{ question.answer_text }}</p>
+            </div>
+        {% endfor %}
 
+        <!--{% for question, answer in answer_question_list %}-->
+            <!--{% for option in choices %}-->
+                <!--{% if option == answer %}-->
+                    <!--<p><font color="red">{{ question.choiceA }}</font></p>-->
+                <!--{% elif option == question.answer %}-->
+                    <!--<p><font color="green">{{ choices|get_item:option }}</font></p>-->
+                <!--{% else %}-->
+                    <!--<p>{{ choices|get_item:option }}</p>-->
+                <!--{% endif %}-->
+            <!--{% endfor %}-->
+        <!--{% endfor %}-->
+
+
+
+
+
+    </center>
 </body>
+{% endblock %}
 </html>

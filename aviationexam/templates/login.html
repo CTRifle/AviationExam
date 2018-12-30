@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'login.css' %}">
 <head>
     <meta charset="UTF-8">
     <title>Log In</title>
 </head>
-<center><body>
-<p style="color:red">{{ error_message }}</p>
-<br>
-<form action={% url 'log_user' %} method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Log in">
-
-</body></center>
+<body>
+    <center>
+        <div class="login-section">
+            <p style="color:red">{{ error_message }}</p>
+            <br>
+            <p>Login</p>
+            <form action={% url 'log_user' %} method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="Log in">
+            </form>
+        </div>
+    </center>
+</body>
 </html>
