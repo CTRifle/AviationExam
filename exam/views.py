@@ -3,9 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse
-from exam.forms import CreateUser, Login, NewExam, OptionSubmit
-from exam.models import Exam
+from exam.forms import CreateUser, Login, NewExam, OptionSubmit, UploadFileForm
+from exam.models import Exam, Question
 from django.template.defaulttags import register
+
+from openpyxl import load_workbook
 
 @register.filter
 def get_item(dictionary, key):
@@ -17,7 +19,8 @@ def answer(id):
 
 
 def welcome(request):
-    return render(request, "welcome.html")
+
+    return render(request, "homepage.html")
 
 def create_user(request):
     if request.method == 'POST':
@@ -183,36 +186,22 @@ def question_form(request, pk):
 
     return render(request, "exam_templates/questionform.html", context)
 
-def continue_exam(request):
-    if request.method == 'POST':
-        exam_id = int(request.POST.get("exam_id"))
-        return HttpResponseRedirect(reverse('question_form', kwargs={'pk': exam_id }))
-
-    else:
-        return redirect("exam_templates/previousexams.html")
-
-
 @login_required()
 def results(request, pk):
     current_exam = Exam.objects.get(id=int(pk))
     incorrect_questions = current_exam.get_incorrect_questions()
+    incorrect_answers = current_exam.get_incorrect_answers()
     result_message = current_exam.result_message()
     percent = current_exam.result_percentage()
-    choices = {
-        "a": "incorrect_questions.choiceA",
-        "b": "question.choiceB",
-        "c": "question.choiceC",
-        "d": "question.choiceD",
-    }
-
-    answer_question_list = zip(incorrect_questions, current_exam.incorrect_answers)
+    answer_question_list = list(zip(incorrect_questions, incorrect_answers))
+    print(list(answer_question_list))
     context = {
         "exam" : current_exam,
         "pk" : pk,
         "incorrect_questions": incorrect_questions,
+        "incorrect_answers": incorrect_answers,
         "result_message" : result_message,
         "percent" : percent,
-        "choices" : choices,
         "answer_question_list" : answer_question_list,
     }
 
@@ -224,3 +213,40 @@ def add_question(request):
 def log_out(request):
     logout(request)
     return redirect("welcome")
+
+def testpage(request):
+    return render(request, "index.html")
+
+def upload_file(request):
+    def to_database(file):
+        book = load_workbook(file)
+        sheet = book.active
+
+        for i in range(2, 191):
+            ques_obj = Question.objects.create(
+                text=sheet.cell(row=i, column=4).value,
+                topic = sheet.cell(row=i, column=3).value,
+                choiceA = sheet.cell(row=i, column=5).value,
+                choiceB = sheet.cell(row=i, column=6).value,
+                choiceC = sheet.cell(row=i, column=7).value,
+                choiceD = sheet.cell(row=i, column=8).value,
+                answer = sheet.cell(row=i, column=10).value,
+                answer_text = sheet.cell(row=i, column=11).value,
+                subject = sheet.cell(row=i, column=2).value,
+                context = sheet.cell(row=i, column=9).value
+                )
+            ques_obj.save()
+            ques_obj.id = (i - 1)
+            ques_obj.save()
+
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            to_database(request.FILES['file'])
+            return HttpResponseRedirect('welcome.html')
+    else:
+        form = UploadFileForm()
+    return render(request, 'exam_templates/upload.html', {'form': form})
+
+
+

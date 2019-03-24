@@ -49,3 +49,7 @@ class ContinueQuiz(forms.Form):
         super(ContinueQuiz, self).__init__(*args, **kwargs)
 
         self.fields['exam_id'] = forms.HiddenInput()
+
+class UploadFileForm(forms.Form):
+    title = forms.CharField(max_length=50)
+    file = forms.FileField()

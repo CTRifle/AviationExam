@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:font-color="http://www.w3.org/1999/xhtml">
 {% extends "header.html" %}
 {% load static %}
 {% block maincontent %}
@@ -8,8 +8,9 @@
     <title>Results</title>
 </head>
 <body>
-<link rel="stylesheet" type="text/css" href="{% static 'results.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/results.css' %}">
     <center>
+    <div>
     {% if percent < 90 %}
         <p id="percent"><font color="red">{{ percent }}%</font></p>
     {% else %}
@@ -17,33 +18,59 @@
     {% endif %}
     <p>{{ result_message }}</p>
     <br>
-        {% for question in incorrect_questions %}
-            <div class="question-display">
-                <h1>{{ question.text }}</h1>
-                <p>{{ question.choiceA }}</p>
-                <p>{{ question.choiceB }}</p>
-                <p>{{ question.choiceC }}</p>
-                <p>{{ question.choiceD }}</p>
-                <br>
-                <p>Explanation: {{ question.answer_text }}</p>
-            </div>
-        {% endfor %}
-
-        <!--{% for question, answer in answer_question_list %}-->
-            <!--{% for option in choices %}-->
-                <!--{% if option == answer %}-->
-                    <!--<p><font color="red">{{ question.choiceA }}</font></p>-->
-                <!--{% elif option == question.answer %}-->
-                    <!--<p><font color="green">{{ choices|get_item:option }}</font></p>-->
-                <!--{% else %}-->
-                    <!--<p>{{ choices|get_item:option }}</p>-->
-                <!--{% endif %}-->
-            <!--{% endfor %}-->
+        <!--{% for question in incorrect_questions %}-->
+            <!--<div class="question-display">-->
+                <!--<h1>{{ question.text }}</h1>-->
+                <!--<p>{{ question.choiceA }}</p>-->
+                <!--<p>{{ question.choiceB }}</p>-->
+                <!--<p>{{ question.choiceC }}</p>-->
+                <!--<p>{{ question.choiceD }}</p>-->
+                <!--<br>-->
+                <!--<p>Explanation: {{ question.answer_text }}</p>-->
+            <!--</div>-->
         <!--{% endfor %}-->
 
+        {% for question, answer in answer_question_list %}
+            <div class="question-display">
+                <h1>{{ question.text }}</h1>
+                    {% if answer == "a" %}
+                        <p><font color="red">{{ question.choiceA }}</font></p>
+                    {% elif question.answer == "a" %}
+                        <p><font color="green">{{ question.choiceA }}</font></p>
+                    {% else %}
+                        <p>{{ question.choiceA }}</font></p>
+                    {% endif %}
 
+                    {% if answer == "b" %}
+                        <p><font color="red">{{ question.choiceB }}</font></p>
+                    {% elif question.answer == "b" %}
+                        <p><font color="green">{{ question.choiceB }}</font></p>
+                    {% else %}
+                        <p>{{ question.choiceB }}</font></p>
+                    {% endif %}
 
+                    {% if answer == "c" %}
+                        <p><font color="red">{{ question.choiceC }}</font></p>
+                    {% elif question.answer == "c" %}
+                        <p><font color="green">{{ question.choiceC }}</font></p>
+                    {% else %}
+                        <p>{{ question.choiceC }}</font></p>
+                    {% endif %}
 
+                    {% if answer == "d" %}
+                        <p><font color="red">{{ question.choiceD }}</font></p>
+                    {% elif question.answer == "d" %}
+                        <p><font color="green">{{ question.choiceD }}</font></p>
+                    {% else %}
+                        <p>{{ question.choiceD }}</font></p>
+                    {% endif %}
+                    <br>
+                    <p>{{ question.answer_text }}</p>
+            </div>
+        {% endfor %}
+        <a href="{% url "new_exam" %}"><button type="button">Start a New test</button></a>
+        <a href="...."><button type="button">Review my stats</button></a>
+        <a href="{% url "welcome" %}"><button type="button">Back to homepage</button></a>
 
     </center>
 </body>
